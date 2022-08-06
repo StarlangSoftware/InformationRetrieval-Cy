@@ -7,9 +7,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 from Cython.Build import cythonize
 
 setup(
-    ext_modules=cythonize(["InformationRetrieval/*.pyx",
-                           "InformationRetrieval/*.pxd",
-                           "InformationRetrieval/Document/*.pyx",
+    ext_modules=cythonize(["InformationRetrieval/Document/*.pyx",
                            "InformationRetrieval/Document/*.pxd",
                            "InformationRetrieval/Index/*.pyx",
                            "InformationRetrieval/Index/*.pxd",
