@@ -5,11 +5,13 @@ from Dictionary.Word cimport Word
 
 from InformationRetrieval.Document.Document cimport Document
 from InformationRetrieval.Document.DocumentText cimport DocumentText
+from InformationRetrieval.Document.DocumentWeighting import DocumentWeighting
 from InformationRetrieval.Document.IndexType import IndexType
 from InformationRetrieval.Index.PositionalPostingList cimport PositionalPostingList
 from InformationRetrieval.Index.PostingList cimport PostingList
 from InformationRetrieval.Index.TermOccurrence cimport TermOccurrence
 from InformationRetrieval.Index.TermType import TermType
+from InformationRetrieval.Index.TermWeighting import TermWeighting
 from InformationRetrieval.Query.RetrievalType import RetrievalType
 
 cdef class Collection:
@@ -523,8 +525,8 @@ cdef class Collection:
     cpdef searchCollection(self,
                          Query query,
                          object retrievalType,
-                         object termWeighting,
-                         object documentWeighting):
+                         object termWeighting = TermWeighting.NATURAL,
+                         object documentWeighting = DocumentWeighting.NO_IDF):
         if self._indexType == IndexType.INCIDENCE_MATRIX:
             return self._incidenceMatrix.search(query, self._dictionary)
         else:

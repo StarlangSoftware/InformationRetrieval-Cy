@@ -90,6 +90,8 @@ cdef class InvertedIndex:
             termIndex = dictionary.getWordIndex(query.getTerm(i).getName())
             if termIndex != -1:
                 queryTerms.append(self._index[termIndex])
+            else:
+                return QueryResult()
         queryTerms.sort(key=cmp_to_key(PostingList.postingListComparator))
         result = queryTerms[0]
         for i in range(1, len(queryTerms)):

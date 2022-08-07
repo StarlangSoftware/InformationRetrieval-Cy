@@ -31,6 +31,8 @@ cdef class IncidenceMatrix:
             if termIndex != -1:
                 for j in range(self._documentSize):
                     resultRow[j] = resultRow[j] and self._incidenceMatrix[termIndex][j]
+            else:
+                return result
         for i in range(self._documentSize):
             if resultRow[i]:
                 result.add(i)

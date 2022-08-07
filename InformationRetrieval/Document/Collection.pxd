@@ -62,5 +62,5 @@ cdef class Collection:
     cpdef searchCollection(self,
                          Query query,
                          object retrievalType,
-                         object termWeighting,
-                         object documentWeighting)
+                         object termWeighting = ?,
+                         object documentWeighting = ?)
