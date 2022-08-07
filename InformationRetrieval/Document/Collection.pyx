@@ -244,7 +244,7 @@ cdef class Collection:
             if wordIndex != -1:
                 termId = nGramDictionary.getWordWithIndex(wordIndex).getTermId()
             else:
-                termId = abs(term.getTerm().getName().__hash__())
+                termId = term.getTerm().getName().__hash__() % (2 ** 24)
                 nGramDictionary.addTerm(term.getTerm().getName(), termId)
             nGramIndex.add(termId, wordId)
 
@@ -390,7 +390,7 @@ cdef class Collection:
                 if wordIndex != -1:
                     termId = dictionary.getWordWithIndex(wordIndex).getTermId()
                 else:
-                    termId = abs(word.__hash__())
+                    termId = word.__hash__() % (2 ** 24)
                     dictionary.addTerm(word, termId)
                 invertedIndex.add(termId, doc.getDocId())
         if len(self._documents) != 0:
@@ -466,7 +466,7 @@ cdef class Collection:
                 if wordIndex != -1:
                     termId = dictionary.getWordWithIndex(wordIndex).getTermId()
                 else:
-                    termId = abs(termOccurrence.getTerm().getName().__hash__())
+                    termId = termOccurrence.getTerm().getName().__hash__() % (2 ** 24)
                     dictionary.addTerm(termOccurrence.getTerm().getName(), termId)
                 positionalIndex.addPosition(termId, termOccurrence.getDocId(), termOccurrence.getPosition())
         if len(self._documents) != 0:
