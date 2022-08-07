@@ -1,9 +1,13 @@
 from MorphologicalAnalysis.FsmMorphologicalAnalyzer import FsmMorphologicalAnalyzer
 from MorphologicalDisambiguation.MorphologicalDisambiguator cimport MorphologicalDisambiguator
 
+from InformationRetrieval.Document.IndexType import IndexType
+from InformationRetrieval.Index.TermOccurrence import TermOccurrence
+
 cdef class Parameter:
 
     def __init__(self):
+        self._indexType = IndexType.INVERTED_INDEX
         self._loadIndexesFromFile = False
         self._normalizeDocument = False
         self._phraseIndex = True
@@ -14,6 +18,7 @@ cdef class Parameter:
         self._limitNumberOfDocumentsLoaded = False
         self._documentLimit = 1000
         self._wordLimit = 10000
+        self._wordComparator = TermOccurrence.ignoreCaseComparator
 
     cpdef object getIndexType(self):
         return self._indexType
