@@ -1,11 +1,11 @@
 cdef class QueryResultItem:
 
     def __init__(self, docId: int, score: float):
-        self._docId = docId
-        self._score = score
+        self.__doc_id = docId
+        self.__score = score
 
     cpdef int getDocId(self):
-        return self._docId
+        return self.__doc_id
 
     cpdef float getScore(self):
-        return self._score
+        return self.__score

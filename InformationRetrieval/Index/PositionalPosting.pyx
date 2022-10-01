@@ -1,25 +1,25 @@
 cdef class PositionalPosting(Posting):
 
     def __init__(self, docId: int):
-        self._positions = []
-        self._docId = docId
+        self.__positions = []
+        self.__doc_id = docId
 
     cpdef add(self, int position):
-        self._positions.append(Posting(position))
+        self.__positions.append(Posting(position))
 
     cpdef int getDocId(self):
-        return self._docId
+        return self.__doc_id
 
     cpdef list getPositions(self):
-        return self._positions
+        return self.__positions
 
     cpdef int size(self):
-        return len(self._positions)
+        return len(self.__positions)
 
     def __str__(self) -> str:
         cdef str result
         cdef Posting posting
-        result = self._docId.__str__() + " " + len(self._positions).__str__()
-        for posting in self._positions:
+        result = self.__doc_id.__str__() + " " + len(self.__positions).__str__()
+        for posting in self.__positions:
             result = result + " " + posting.getId().__str__()
         return result

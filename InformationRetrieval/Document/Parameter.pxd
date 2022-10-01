@@ -3,20 +3,20 @@ from MorphologicalDisambiguation.MorphologicalDisambiguator cimport Morphologica
 
 cdef class Parameter:
 
-    cdef object _indexType
-    cdef object _wordComparator
-    cdef bint _loadIndexesFromFile
-    cdef MorphologicalDisambiguator _disambiguator
-    cdef FsmMorphologicalAnalyzer _fsm
-    cdef bint _normalizeDocument
-    cdef bint _phraseIndex
-    cdef bint _positionalIndex
-    cdef bint _constructNGramIndex
-    cdef bint _constructIndexInDisk
-    cdef bint _constructDictionaryInDisk
-    cdef bint _limitNumberOfDocumentsLoaded
-    cdef int _documentLimit
-    cdef int _wordLimit
+    cdef object __index_type
+    cdef object __word_comparator
+    cdef bint __load_indexes_from_file
+    cdef MorphologicalDisambiguator __disambiguator
+    cdef FsmMorphologicalAnalyzer __fsm
+    cdef bint __normalize_document
+    cdef bint __phrase_index
+    cdef bint __positional_index
+    cdef bint __construct_n_gram_index
+    cdef bint __construct_index_in_disk
+    cdef bint __construct_dictionary_in_disk
+    cdef bint __limit_number_of_documents_loaded
+    cdef int __document_limit
+    cdef int __word_limit
 
     cpdef object getIndexType(self)
     cpdef object getWordComparator(self)

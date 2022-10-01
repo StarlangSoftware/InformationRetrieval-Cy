@@ -8,7 +8,9 @@ from InformationRetrieval.Index.TermType import TermType
 
 cdef class DocumentText(Corpus):
 
-    def __init__(self, fileName: str, sentenceSplitter: SentenceSplitter = None):
+    def __init__(self,
+                 fileName: str,
+                 sentenceSplitter: SentenceSplitter = None):
         super().__init__(fileName, sentenceSplitter)
 
     cpdef set constructDistinctWordList(self, object termType):
@@ -26,7 +28,9 @@ cdef class DocumentText(Corpus):
                         words.add(sentence.getWord(j).getName() + " " + sentence.getWord(j + 1).getName())
         return words
 
-    cpdef list constructTermList(self, int docId, object termType):
+    cpdef list constructTermList(self,
+                                 int docId,
+                                 object termType):
         cdef list terms
         cdef int size, i, j
         cdef Sentence sentence

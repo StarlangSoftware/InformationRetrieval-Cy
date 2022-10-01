@@ -2,7 +2,7 @@ from InformationRetrieval.Index.PostingList cimport PostingList
 
 cdef class PostingSkipList(PostingList):
 
-    cdef bint _skipped
+    cdef bint __skipped
 
     cpdef add(self, int docId)
     cpdef addSkipPointers(self)

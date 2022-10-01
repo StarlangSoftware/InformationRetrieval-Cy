@@ -2,9 +2,9 @@ from Dictionary.Word cimport Word
 
 cdef class TermOccurrence:
 
-    cdef Word _term
-    cdef int _docID
-    cdef int _position
+    cdef Word __term
+    cdef int __doc_id
+    cdef int __position
 
     cpdef Word getTerm(self)
     cpdef int getDocId(self)

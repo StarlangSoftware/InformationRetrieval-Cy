@@ -14,26 +14,26 @@ cdef class VectorSpaceModel:
         cdef float _sum
         cdef int i
         _sum = 0
-        self._model = []
+        self.__model = []
         for i in range(len(termFrequencies)):
-            self._model.append(self.weighting(termFrequencies[i],
-                                              documentFrequencies[i],
-                                              documentSize,
-                                              termWeighting,
-                                              documentWeighting))
-            _sum = _sum + self._model[i] * self._model[i]
+            self.__model.append(self.weighting(termFrequencies[i],
+                                               documentFrequencies[i],
+                                               documentSize,
+                                               termWeighting,
+                                               documentWeighting))
+            _sum = _sum + self.__model[i] * self.__model[i]
         for i in range(len(termFrequencies)):
-            self._model[i] = self._model[i] / sqrt(_sum)
+            self.__model[i] = self.__model[i] / sqrt(_sum)
 
     cpdef float get(self, int index):
-        return self._model[index]
+        return self.__model[index]
 
     cpdef cosineSimilarity(self, VectorSpaceModel secondModel):
         cdef float _sum
         cdef int i
         _sum = 0.0
-        for i in range(len(self._model)):
-            _sum = _sum + self._model[i] * secondModel._model[i]
+        for i in range(len(self.__model)):
+            _sum = _sum + self.__model[i] * secondModel.__model[i]
         return _sum
 
     @staticmethod

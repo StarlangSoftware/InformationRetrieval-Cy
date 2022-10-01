@@ -1,7 +1,7 @@
 cdef class Posting:
 
     def __init__(self, Id: int):
-        self.Id = Id
+        self.__id = Id
 
     cpdef int getId(self):
-        return self.Id
+        return self.__id

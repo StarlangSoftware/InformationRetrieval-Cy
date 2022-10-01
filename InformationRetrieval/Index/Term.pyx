@@ -4,7 +4,7 @@ cdef class Term(Word):
 
     def __init__(self, name: str, termId: int):
         super().__init__(name)
-        self._termId = termId
+        self.__term_id = termId
 
     cpdef int getTermId(self):
-        return self._termId
+        return self.__term_id

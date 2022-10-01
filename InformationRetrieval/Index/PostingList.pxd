@@ -2,7 +2,7 @@ from InformationRetrieval.Query.QueryResult cimport QueryResult
 
 cdef class PostingList:
 
-    cdef list _postings
+    cdef list __postings
 
     cpdef add(self, int docId)
     cpdef int size(self)

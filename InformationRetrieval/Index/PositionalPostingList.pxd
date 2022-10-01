@@ -3,7 +3,7 @@ from InformationRetrieval.Query.QueryResult cimport QueryResult
 
 cdef class PositionalPostingList:
 
-    cdef list _postings
+    cdef list __postings
 
     cpdef int size(self)
     cpdef int getIndex(self, int docId)

@@ -2,8 +2,8 @@ from InformationRetrieval.Index.Posting cimport Posting
 
 cdef class PositionalPosting(Posting):
 
-    cdef list _positions
-    cdef int _docId
+    cdef list __positions
+    cdef int __doc_id
 
     cpdef add(self, int position)
     cpdef int getDocId(self)

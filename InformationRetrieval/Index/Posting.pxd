@@ -1,5 +1,5 @@
 cdef class Posting:
 
-    cdef int Id
+    cdef int __id
 
     cpdef int getId(self)

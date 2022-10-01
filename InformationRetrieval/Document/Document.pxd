@@ -6,10 +6,10 @@ from InformationRetrieval.Document.DocumentText cimport DocumentText
 
 cdef class Document:
 
-    cdef str _absoluteFileName
-    cdef str _fileName
-    cdef int _docId
-    cdef int _size
+    cdef str __absolute_file_name
+    cdef str __file_name
+    cdef int __doc_id
+    cdef int __size
 
     cpdef DocumentText loadDocument(self)
     cpdef Corpus normalizeDocument(self,

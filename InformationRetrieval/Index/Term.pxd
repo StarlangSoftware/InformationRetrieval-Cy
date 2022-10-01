@@ -2,6 +2,6 @@ from Dictionary.Word cimport Word
 
 cdef class Term(Word):
 
-    cdef int _termId
+    cdef int __term_id
 
     cpdef int getTermId(self)

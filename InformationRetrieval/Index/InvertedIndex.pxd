@@ -4,7 +4,7 @@ from InformationRetrieval.Query.QueryResult cimport QueryResult
 
 cdef class InvertedIndex:
 
-    cdef object _index
+    cdef object __index
 
     cpdef readPostingList(self, str fileName)
     cpdef saveSorted(self, str fileName)

@@ -8,51 +8,53 @@ from InformationRetrieval.Index.TermOccurrence cimport TermOccurrence
 
 cdef class TermDictionary(Dictionary):
 
-    def __init__(self, comparator: object, fileNameOrTerms = None):
-        cdef str fileName, line, word
-        cdef int termId
+    def __init__(self,
+                 comparator: object,
+                 fileNameOrTerms = None):
+        cdef str file_name, line, word
+        cdef int term_id
         cdef list terms
-        cdef TermOccurrence term, previousTerm
+        cdef TermOccurrence term, previous_term
         cdef int i
-        cdef list wordList
-        cdef Word termWord
+        cdef list word_list
+        cdef Word term_word
         super().__init__(comparator)
         if fileNameOrTerms is not None:
             if isinstance(fileNameOrTerms, str):
-                fileName = fileNameOrTerms
-                infile = open(fileName + "-dictionary.txt", mode='r', encoding='utf-8')
-                line = infile.readline().strip()
+                file_name = fileNameOrTerms
+                input_file = open(file_name + "-dictionary.txt", mode='r', encoding='utf-8')
+                line = input_file.readline().strip()
                 while line != "":
-                    termId = int(line[0:line.index(" ")])
-                    self.words.append(Term(line[line.index(" ") + 1:], termId))
-                    line = infile.readline().strip()
-                infile.close()
+                    term_id = int(line[0:line.index(" ")])
+                    self.words.append(Term(line[line.index(" ") + 1:], term_id))
+                    line = input_file.readline().strip()
+                input_file.close()
             else:
                 if isinstance(fileNameOrTerms, list):
-                    termId = 0
+                    term_id = 0
                     terms = fileNameOrTerms
                     if len(terms) > 0:
                         term = terms[0]
-                        self.addTerm(term.getTerm().getName(), termId)
-                        termId = termId + 1
-                        previousTerm = term
+                        self.addTerm(term.getTerm().getName(), term_id)
+                        term_id = term_id + 1
+                        previous_term = term
                         i = 1
                         while i < len(terms):
                             term = terms[i]
-                            if term.isDifferent(previousTerm):
-                                self.addTerm(term.getTerm().getName(), termId)
-                                termId = termId + 1
+                            if term.isDifferent(previous_term):
+                                self.addTerm(term.getTerm().getName(), term_id)
+                                term_id = term_id + 1
                             i = i + 1
-                            previousTerm = term
+                            previous_term = term
                 else:
-                    wordList = []
+                    word_list = []
                     for word in fileNameOrTerms:
-                        wordList.append(Word(word))
-                    wordList.sort(key=cmp_to_key(comparator))
-                    termId = 0
-                    for termWord in wordList:
-                        self.addTerm(termWord.getName(), termId)
-                        termId = termId + 1
+                        word_list.append(Word(word))
+                    word_list.sort(key=cmp_to_key(comparator))
+                    term_id = 0
+                    for term_word in word_list:
+                        self.addTerm(term_word.getName(), term_id)
+                        term_id = term_id + 1
 
     cpdef int __getPosition(self, Word word):
         cdef int lo, hi, mid
@@ -68,7 +70,9 @@ cdef class TermDictionary(Dictionary):
                 return mid
         return -(lo + 1)
 
-    cpdef addTerm(self, str name, int termId):
+    cpdef addTerm(self,
+                  str name,
+                  int termId):
         cdef int middle
         middle = self.__getPosition(Word(name))
         if middle < 0:
@@ -77,18 +81,20 @@ cdef class TermDictionary(Dictionary):
     cpdef save(self, str fileName):
         cdef Word word
         cdef Term term
-        outfile = open(fileName + "-dictionary.txt", mode='w', encoding='utf-8')
+        output_file = open(fileName + "-dictionary.txt", mode='w', encoding='utf-8')
         for word in self.words:
             term = word
-            outfile.write(term.getTermId().__str__() + " " + term.getName() + "\n")
-        outfile.close()
+            output_file.write(term.getTermId().__str__() + " " + term.getName() + "\n")
+        output_file.close()
 
     @staticmethod
-    def constructNGrams(word: str, termId: int, k: int) -> [TermOccurrence]:
-        cdef list nGrams
+    def constructNGrams(word: str,
+                        termId: int,
+                        k: int) -> [TermOccurrence]:
+        cdef list n_grams
         cdef int j
         cdef str term
-        nGrams = []
+        n_grams = []
         if len(word) >= k - 1:
             for j in range(-1, len(word) - k + 2):
                 if j == -1:
@@ -97,8 +103,8 @@ cdef class TermDictionary(Dictionary):
                     term = word[j: j + k - 1] + "$"
                 else:
                     term = word[j: j + k]
-                nGrams.append(TermOccurrence(Word(term), termId, j))
-        return nGrams
+                n_grams.append(TermOccurrence(Word(term), termId, j))
+        return n_grams
 
     cpdef list constructTermsFromDictionary(self, int k):
         cdef list terms

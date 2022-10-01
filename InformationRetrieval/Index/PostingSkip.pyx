@@ -2,22 +2,22 @@ cdef class PostingSkip(Posting):
 
     def __init__(self, Id: int):
         super().__init__(Id)
-        self._skipAvailable = False
-        self._skip = None
-        self._next = None
+        self.__skip_available = False
+        self.__skip = None
+        self.__next = None
 
     cpdef bint hasSkip(self):
-        return self._skipAvailable
+        return self.__skip_available
 
     cpdef addSkip(self, PostingSkip skip):
-        self._skipAvailable = True
-        self._skip = skip
+        self.__skip_available = True
+        self.__skip = skip
 
     cpdef setNext(self, PostingSkip _next):
-        self._next = _next
+        self.__next = _next
 
     cpdef PostingSkip next(self):
-        return self._next
+        return self.__next
 
     cpdef PostingSkip getSkip(self):
-        return self._skip
+        return self.__skip

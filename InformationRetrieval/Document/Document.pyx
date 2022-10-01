@@ -9,43 +9,43 @@ from MorphologicalDisambiguation.MorphologicalDisambiguator cimport Morphologica
 cdef class Document:
 
     def __init__(self, absoluteFileName: str, fileName: str, docId: int):
-        self._size = 0
-        self._absoluteFileName = absoluteFileName
-        self._fileName = fileName
-        self._docId = docId
+        self.__size = 0
+        self.__absolute_file_name = absoluteFileName
+        self.__file_name = fileName
+        self.__doc_id = docId
 
     cpdef DocumentText loadDocument(self):
-        documentText = DocumentText(self._absoluteFileName, TurkishSplitter())
-        self._size = documentText.numberOfWords()
-        return documentText
+        document_text = DocumentText(self.__absolute_file_name, TurkishSplitter())
+        self.__size = document_text.numberOfWords()
+        return document_text
 
     cpdef Corpus normalizeDocument(self,
                                    MorphologicalDisambiguator disambiguator,
                                    FsmMorphologicalAnalyzer fsm):
         cdef Corpus corpus
         cdef int i
-        cdef Sentence sentence, newSentence
-        cdef FsmParse fsmParse
-        corpus = Corpus(self._absoluteFileName)
+        cdef Sentence sentence, new_sentence
+        cdef FsmParse fsm_parse
+        corpus = Corpus(self.__absolute_file_name)
         for i in range(corpus.sentenceCount()):
             sentence = corpus.getSentence(i)
             parses = fsm.robustMorphologicalAnalysis(sentence)
-            correctParses = disambiguator.disambiguate(parses)
-            newSentence = Sentence()
-            for fsmParse in correctParses:
-                newSentence.addWord(Word(fsmParse.getWord().getName()))
-            corpus.addSentence(newSentence)
-        self._size = corpus.numberOfWords()
+            correct_parses = disambiguator.disambiguate(parses)
+            new_sentence = Sentence()
+            for fsm_parse in correct_parses:
+                new_sentence.addWord(Word(fsm_parse.getWord().getName()))
+            corpus.addSentence(new_sentence)
+        self.__size = corpus.numberOfWords()
         return corpus
 
     cpdef int getDocId(self):
-        return self._docId
+        return self.__doc_id
 
     cpdef str getFileName(self):
-        return self._fileName
+        return self.__file_name
 
     cpdef str getAbsoluteFileName(self):
-        return self._absoluteFileName
+        return self.__absolute_file_name
 
     cpdef int getSize(self):
-        return self._size
+        return self.__size

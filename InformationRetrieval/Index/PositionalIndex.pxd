@@ -4,7 +4,7 @@ from InformationRetrieval.Query.QueryResult cimport QueryResult
 
 cdef class PositionalIndex:
 
-    cdef object _positionalIndex
+    cdef object __positional_index
 
     cpdef readPositionalPostingList(self, str fileName)
     cpdef saveSorted(self, str fileName)

@@ -5,7 +5,8 @@ from InformationRetrieval.Query.QueryResultItem cimport QueryResultItem
 cdef class QueryResult:
 
     @staticmethod
-    def queryResultItemComparator(resultA: QueryResultItem, resultB: QueryResultItem):
+    def queryResultItemComparator(resultA: QueryResultItem,
+                                  resultB: QueryResultItem):
         if resultA.getScore() > resultB.getScore():
             return -1
         else:
@@ -15,13 +16,13 @@ cdef class QueryResult:
                 return 0
 
     def __init__(self):
-        self._items = []
+        self.__items = []
 
     cpdef add(self, int docId, float score = 0.0):
-        self._items.append(QueryResultItem(docId, score))
+        self.__items.append(QueryResultItem(docId, score))
 
     cpdef list getItems(self):
-        return self._items
+        return self.__items
 
     cpdef sort(self):
-        self._items.sort(key=cmp_to_key(self.queryResultItemComparator))
+        self.__items.sort(key=cmp_to_key(self.queryResultItemComparator))
