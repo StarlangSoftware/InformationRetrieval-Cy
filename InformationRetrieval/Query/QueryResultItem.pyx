@@ -9,3 +9,6 @@ cdef class QueryResultItem:
 
     cpdef float getScore(self):
         return self.__score
+
+    def __repr__(self):
+        return f"{self.__doc_id} {self.__score}"

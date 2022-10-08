@@ -15,7 +15,7 @@ setup(
                            "InformationRetrieval/Query/*.pxd"],
                           compiler_directives={'language_level': "3"}),
     name='NlpToolkit-InformationRetrieval-Cy',
-    version='1.0.2',
+    version='1.0.3',
     packages=['InformationRetrieval',
               'InformationRetrieval.Document',
               'InformationRetrieval.Index',

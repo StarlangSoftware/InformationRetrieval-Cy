@@ -47,6 +47,7 @@ cdef class Collection:
             self.__inverted_index = InvertedIndex(directory)
             if parameter.constructPositionalIndex():
                 self.__positional_index = PositionalIndex(directory)
+                self.__positional_index.setDocumentSizes(self.__documents)
             if parameter.constructPhraseIndex():
                 self.__phrase_dictionary = TermDictionary(self.__comparator, directory + "-phrase")
                 self.__phrase_index = InvertedIndex(directory + "-phrase")

@@ -19,3 +19,4 @@ cdef class Document:
     cpdef str getFileName(self)
     cpdef str getAbsoluteFileName(self)
     cpdef int getSize(self)
+    cpdef setSize(self, int size)

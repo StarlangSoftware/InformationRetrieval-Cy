@@ -8,22 +8,22 @@ from InformationRetrieval.Query.Query cimport Query
 
 cdef class Collection:
 
-    cdef object _indexType
-    cdef TermDictionary _dictionary
-    cdef TermDictionary _phraseDictionary
-    cdef TermDictionary _biGramDictionary
-    cdef TermDictionary _triGramDictionary
-    cdef list _documents
-    cdef IncidenceMatrix _incidenceMatrix
-    cdef InvertedIndex _invertedIndex
-    cdef NGramIndex _biGramIndex
-    cdef NGramIndex _triGramIndex
-    cdef PositionalIndex _positionalIndex
-    cdef InvertedIndex _phraseIndex
-    cdef PositionalIndex _phrasePositionalIndex
-    cdef object _comparator
-    cdef str _name
-    cdef Parameter _parameter
+    cdef object __index_type
+    cdef TermDictionary __dictionary
+    cdef TermDictionary __phrase_dictionary
+    cdef TermDictionary __bi_gram_dictionary
+    cdef TermDictionary __tri_gram_dictionary
+    cdef list __documents
+    cdef IncidenceMatrix __incidence_matrix
+    cdef InvertedIndex __inverted_index
+    cdef NGramIndex __bi_gram_index
+    cdef NGramIndex __tri_gram_index
+    cdef PositionalIndex __positional_index
+    cdef InvertedIndex __phrase_index
+    cdef PositionalIndex __phrase_positional_index
+    cdef object __comparator
+    cdef str __name
+    cdef Parameter __parameter
 
     cpdef int size(self)
     cpdef int vocabularySize(self)

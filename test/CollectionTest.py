@@ -75,7 +75,7 @@ class CollectionTest(unittest.TestCase):
 
     def testPositionalIndexRankedQuery(self):
         parameter = Parameter()
-        parameter.setNGramIndex(True)
+        parameter.setLoadIndexesFromFile(True)
         collection = Collection("../testCollection2", parameter)
         query = Query("Caesar")
         result = collection.searchCollection(query, RetrievalType.RANKED)

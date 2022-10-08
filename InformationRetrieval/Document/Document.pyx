@@ -49,3 +49,6 @@ cdef class Document:
 
     cpdef int getSize(self):
         return self.__size
+
+    cpdef setSize(self, int size):
+        self.__size = size

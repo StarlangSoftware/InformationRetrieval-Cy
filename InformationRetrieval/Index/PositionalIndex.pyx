@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from InformationRetrieval.Document.Document cimport Document
 from InformationRetrieval.Index.PositionalPosting cimport PositionalPosting
 from InformationRetrieval.Index.PositionalPostingList cimport PositionalPostingList
 from InformationRetrieval.Index.TermOccurrence cimport TermOccurrence
@@ -132,6 +133,24 @@ cdef class PositionalIndex:
             df.append(self.__positional_index[key].size())
             i = i + 1
         return df
+
+    cpdef setDocumentSizes(self, list documents):
+        cdef list sizes
+        cdef int i, doc_id
+        cdef PositionalPostingList positional_posting_list
+        cdef PositionalPosting positional_posting
+        cdef Document doc
+        sizes = []
+        for i in range(len(documents)):
+            sizes.append(0)
+        for key in self.__positional_index.keys():
+            positional_posting_list = self.__positional_index[key]
+            for i in range(positional_posting_list.size()):
+                positional_posting = positional_posting_list.get(i)
+                doc_id = positional_posting.getDocId()
+                sizes[doc_id] = sizes[doc_id] + positional_posting.size()
+        for doc in documents:
+            doc.setSize(sizes[doc.getDocId()])
 
     cpdef QueryResult rankedSearch(self,
                      Query query,
