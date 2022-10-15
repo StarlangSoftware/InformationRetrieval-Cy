@@ -13,6 +13,7 @@ from InformationRetrieval.Index.TermOccurrence cimport TermOccurrence
 from InformationRetrieval.Index.TermType import TermType
 from InformationRetrieval.Index.TermWeighting import TermWeighting
 from InformationRetrieval.Query.RetrievalType import RetrievalType
+from InformationRetrieval.Query.SearchParameter cimport SearchParameter
 
 cdef class Collection:
 
@@ -531,19 +532,18 @@ cdef class Collection:
 
     cpdef searchCollection(self,
                          Query query,
-                         object retrievalType,
-                         object termWeighting = TermWeighting.NATURAL,
-                         object documentWeighting = DocumentWeighting.NO_IDF):
+                         SearchParameter searchParameter):
         if self.__index_type == IndexType.INCIDENCE_MATRIX:
             return self.__incidence_matrix.search(query, self.__dictionary)
         else:
-            if retrievalType == RetrievalType.BOOLEAN:
+            if searchParameter.getRetrievalType() == RetrievalType.BOOLEAN:
                 return self.__inverted_index.search(query, self.__dictionary)
-            elif retrievalType == RetrievalType.POSITIONAL:
+            elif searchParameter.getRetrievalType() == RetrievalType.POSITIONAL:
                 return self.__positional_index.positionalSearch(query, self.__dictionary)
             else:
                 return self.__positional_index.rankedSearch(query,
                                                             self.__dictionary,
                                                             self.__documents,
-                                                            termWeighting,
-                                                            documentWeighting)
+                                                            searchParameter.getTermWeighting(),
+                                                            searchParameter.getDocumentWeighting(),
+                                                            searchParameter.getDocumentsRetrieved())

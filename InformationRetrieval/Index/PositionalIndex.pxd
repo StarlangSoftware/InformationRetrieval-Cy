@@ -19,4 +19,5 @@ cdef class PositionalIndex:
                      TermDictionary dictionary,
                      list documents,
                      object termWeighting,
-                     object documentWeighting)
+                     object documentWeighting,
+                     documentsReturned: int)

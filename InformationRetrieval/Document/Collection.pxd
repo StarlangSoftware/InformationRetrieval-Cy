@@ -5,6 +5,7 @@ from InformationRetrieval.Index.NGramIndex cimport NGramIndex
 from InformationRetrieval.Index.PositionalIndex cimport PositionalIndex
 from InformationRetrieval.Index.TermDictionary cimport TermDictionary
 from InformationRetrieval.Query.Query cimport Query
+from InformationRetrieval.Query.SearchParameter cimport SearchParameter
 
 cdef class Collection:
 
@@ -59,8 +60,4 @@ cdef class Collection:
     cpdef constructDictionaryAndPositionalIndexInDisk(self, object termType)
     cpdef constructPositionalIndexInDisk(self, TermDictionary dictionary, object termType)
     cpdef constructNGramIndex(self)
-    cpdef searchCollection(self,
-                         Query query,
-                         object retrievalType,
-                         object termWeighting = ?,
-                         object documentWeighting = ?)
+    cpdef searchCollection(self, Query query, SearchParameter searchParameter)

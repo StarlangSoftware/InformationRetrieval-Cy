@@ -157,16 +157,17 @@ cdef class PositionalIndex:
                      TermDictionary dictionary,
                      list documents,
                      object termWeighting,
-                     object documentWeighting):
+                     object documentWeighting,
+                     documentsReturned: int):
         cdef int N, i, term, j, doc_id
-        cdef float tf, df
+        cdef float tf, df, score
         cdef QueryResult result
-        cdef list scores
+        cdef dict scores
         cdef PositionalPostingList positional_posting_list
         cdef PositionalPosting positional_posting
         N = len(documents)
         result = QueryResult()
-        scores = [0 for _ in range(N)]
+        scores = {}
         for i in range(query.size()):
             term = dictionary.getWordIndex(query.getTerm(i).getName())
             if term != -1:
@@ -177,10 +178,12 @@ cdef class PositionalIndex:
                     tf = positional_posting.size()
                     df = self.__positional_index[term].size()
                     if tf > 0 and df > 0:
-                        scores[doc_id] = scores[doc_id] + VectorSpaceModel.weighting(tf, df, N, termWeighting, documentWeighting)
-        for i in range(N):
-            scores[i] = scores[i] / documents[i].getSize()
-            if scores[i] > 0:
-                result.add(i, scores[i])
-        result.sort()
+                        score = VectorSpaceModel.weighting(tf, df, N, termWeighting, documentWeighting)
+                        if doc_id in scores:
+                            scores[doc_id] = scores[doc_id] + score
+                        else:
+                            scores[doc_id] = score
+        for doc_id in scores:
+            result.add(doc_id, scores[doc_id])
+        result.getBest(documentsReturned)
         return result
