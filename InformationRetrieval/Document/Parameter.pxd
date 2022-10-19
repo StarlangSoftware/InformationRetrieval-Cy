@@ -17,6 +17,7 @@ cdef class Parameter:
     cdef bint __limit_number_of_documents_loaded
     cdef int __document_limit
     cdef int __word_limit
+    cdef object __document_type
 
     cpdef object getIndexType(self)
     cpdef object getWordComparator(self)
@@ -46,3 +47,5 @@ cdef class Parameter:
     cpdef setDocumentLimit(self, int documentLimit)
     cpdef setConstructDictionaryInDisk(self, bint constructDictionaryInDisk)
     cpdef setWordLimit(self, int wordLimit)
+    cpdef object getDocumentType(self)
+    cpdef setDocumentType(self, object documentType)

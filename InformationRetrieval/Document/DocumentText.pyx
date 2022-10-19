@@ -9,7 +9,7 @@ from InformationRetrieval.Index.TermType import TermType
 cdef class DocumentText(Corpus):
 
     def __init__(self,
-                 fileName: str,
+                 fileName: str = None,
                  sentenceSplitter: SentenceSplitter = None):
         super().__init__(fileName, sentenceSplitter)
 

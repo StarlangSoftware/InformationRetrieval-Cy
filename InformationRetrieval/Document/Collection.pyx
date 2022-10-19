@@ -5,6 +5,7 @@ from Dictionary.Word cimport Word
 
 from InformationRetrieval.Document.Document cimport Document
 from InformationRetrieval.Document.DocumentText cimport DocumentText
+from InformationRetrieval.Document.DocumentType import DocumentType
 from InformationRetrieval.Document.DocumentWeighting import DocumentWeighting
 from InformationRetrieval.Document.IndexType import IndexType
 from InformationRetrieval.Index.PositionalPostingList cimport PositionalPostingList
@@ -40,10 +41,12 @@ cdef class Collection:
                     break
                 file_name = os.path.join(root, file)
                 if file.endswith(".txt"):
-                    document = Document(file_name, file, j)
+                    document = Document(parameter.getDocumentType(), file_name, file, j)
                     self.__documents.append(document)
                     j = j + 1
         if parameter.loadIndexesFromFile():
+            if parameter.getDocumentType() == DocumentType.CATEGORICAL:
+                self.loadCategories()
             self.__dictionary = TermDictionary(self.__comparator, directory)
             self.__inverted_index = InvertedIndex(directory)
             if parameter.constructPositionalIndex():
@@ -88,6 +91,24 @@ cdef class Collection:
                 self.__tri_gram_dictionary.save(self.__name + "-triGram")
                 self.__bi_gram_index.save(self.__name + "-biGram")
                 self.__tri_gram_index.save(self.__name + "-triGram")
+        if self.__parameter.getDocumentType() == DocumentType.CATEGORICAL:
+            self.saveCategories()
+
+    def saveCategories(self):
+        output_file = open(self.__name + "-categories.txt", mode="w", encoding="utf-8")
+        for document in self.__documents:
+            output_file.write(document.getDocId().__str__() + "\t" + document.getCategoryHierarchy().__str__() + "\n")
+        output_file.close()
+
+    def loadCategories(self):
+        input_file = open(self.__name + "-categories.txt", mode="r", encoding="utf-8")
+        line = input_file.readline().strip()
+        while line != "":
+            items = line.split("\t")
+            doc_id = int(items[0])
+            self.__documents[doc_id].setCategoryHierarchy(items[1])
+            line = input_file.readline()
+        input_file.close()
 
     cpdef constructDictionaryInDisk(self):
         self.constructDictionaryAndInvertedIndexInDisk(TermType.TOKEN)

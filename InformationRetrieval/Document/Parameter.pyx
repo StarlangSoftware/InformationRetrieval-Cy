@@ -1,6 +1,7 @@
 from MorphologicalAnalysis.FsmMorphologicalAnalyzer import FsmMorphologicalAnalyzer
 from MorphologicalDisambiguation.MorphologicalDisambiguator cimport MorphologicalDisambiguator
 
+from InformationRetrieval.Document.DocumentType import DocumentType
 from InformationRetrieval.Document.IndexType import IndexType
 from InformationRetrieval.Index.TermOccurrence import TermOccurrence
 
@@ -19,6 +20,7 @@ cdef class Parameter:
         self.__document_limit = 1000
         self.__word_limit = 10000
         self.__word_comparator = TermOccurrence.ignoreCaseComparator
+        self.__document_type = DocumentType.NORMAL
 
     cpdef object getIndexType(self):
         return self.__index_type
@@ -105,3 +107,9 @@ cdef class Parameter:
 
     cpdef setWordLimit(self, int wordLimit):
         self.__word_limit = wordLimit
+
+    cpdef object getDocumentType(self):
+        return self.__document_type
+
+    cpdef setDocumentType(self, object documentType):
+        self.__document_type = documentType

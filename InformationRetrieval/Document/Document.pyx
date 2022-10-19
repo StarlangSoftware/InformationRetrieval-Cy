@@ -6,37 +6,33 @@ from MorphologicalAnalysis.FsmMorphologicalAnalyzer cimport FsmMorphologicalAnal
 from MorphologicalAnalysis.FsmParse cimport FsmParse
 from MorphologicalDisambiguation.MorphologicalDisambiguator cimport MorphologicalDisambiguator
 
+from InformationRetrieval.Document.DocumentType import DocumentType
+
 cdef class Document:
 
-    def __init__(self, absoluteFileName: str, fileName: str, docId: int):
+    def __init__(self, documentType: DocumentType, absoluteFileName: str, fileName: str, docId: int):
         self.__size = 0
         self.__absolute_file_name = absoluteFileName
         self.__file_name = fileName
         self.__doc_id = docId
+        self.__document_type = documentType
 
     cpdef DocumentText loadDocument(self):
-        document_text = DocumentText(self.__absolute_file_name, TurkishSplitter())
-        self.__size = document_text.numberOfWords()
+        if self.__document_type == DocumentType.NORMAL:
+            document_text = DocumentText(self.__absolute_file_name, TurkishSplitter())
+            self.__size = document_text.numberOfWords()
+        elif self.__document_type == DocumentType.CATEGORICAL:
+            corpus = Corpus(self.__absolute_file_name)
+            if corpus.sentenceCount() >= 2:
+                self.__category_hierarchy = CategoryHierarchy(corpus.getSentence(0).__str__())
+                document_text = DocumentText()
+                sentences = TurkishSplitter().split(corpus.getSentence(1).__str__())
+                for sentence in sentences:
+                    document_text.addSentence(sentence)
+                    self.__size = document_text.numberOfWords()
+            else:
+                return None
         return document_text
-
-    cpdef Corpus normalizeDocument(self,
-                                   MorphologicalDisambiguator disambiguator,
-                                   FsmMorphologicalAnalyzer fsm):
-        cdef Corpus corpus
-        cdef int i
-        cdef Sentence sentence, new_sentence
-        cdef FsmParse fsm_parse
-        corpus = Corpus(self.__absolute_file_name)
-        for i in range(corpus.sentenceCount()):
-            sentence = corpus.getSentence(i)
-            parses = fsm.robustMorphologicalAnalysis(sentence)
-            correct_parses = disambiguator.disambiguate(parses)
-            new_sentence = Sentence()
-            for fsm_parse in correct_parses:
-                new_sentence.addWord(Word(fsm_parse.getWord().getName()))
-            corpus.addSentence(new_sentence)
-        self.__size = corpus.numberOfWords()
-        return corpus
 
     cpdef int getDocId(self):
         return self.__doc_id
@@ -52,3 +48,9 @@ cdef class Document:
 
     cpdef setSize(self, int size):
         self.__size = size
+
+    cpdef setCategoryHierarchy(self, str categoryHierarchy):
+        self.__category_hierarchy = CategoryHierarchy(categoryHierarchy)
+
+    cpdef CategoryHierarchy getCategoryHierarchy(self):
+        return self.__category_hierarchy

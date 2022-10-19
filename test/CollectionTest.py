@@ -1,6 +1,7 @@
 import unittest
 
 from InformationRetrieval.Document.Collection import Collection
+from InformationRetrieval.Document.DocumentType import DocumentType
 from InformationRetrieval.Document.IndexType import IndexType
 from InformationRetrieval.Document.Parameter import Parameter
 from InformationRetrieval.Query.Query import Query
@@ -118,6 +119,16 @@ class CollectionTest(unittest.TestCase):
         collection = Collection("../testCollection2", parameter)
         self.assertEqual(1, collection.size())
         self.assertEqual(15, collection.vocabularySize())
+
+    def testCategoricalCollection(self):
+        parameter = Parameter()
+        parameter.setDocumentType(DocumentType.CATEGORICAL)
+        parameter.setLoadIndexesFromFile(True)
+        parameter.setPhraseIndex(False)
+        parameter.setNGramIndex(False)
+        collection = Collection("../testCollection3", parameter)
+        self.assertEqual(1000, collection.size())
+        self.assertEqual(2283, collection.vocabularySize())
 
 
 if __name__ == '__main__':
