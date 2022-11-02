@@ -1,4 +1,5 @@
 from InformationRetrieval.Document.Parameter cimport Parameter
+from InformationRetrieval.Index.CategoryTree cimport CategoryTree
 from InformationRetrieval.Index.IncidenceMatrix cimport IncidenceMatrix
 from InformationRetrieval.Index.InvertedIndex cimport InvertedIndex
 from InformationRetrieval.Index.NGramIndex cimport NGramIndex
@@ -25,6 +26,7 @@ cdef class Collection:
     cdef object __comparator
     cdef str __name
     cdef Parameter __parameter
+    cdef CategoryTree __category_tree
 
     cpdef int size(self)
     cpdef int vocabularySize(self)
@@ -60,4 +62,5 @@ cdef class Collection:
     cpdef constructDictionaryAndPositionalIndexInDisk(self, object termType)
     cpdef constructPositionalIndexInDisk(self, TermDictionary dictionary, object termType)
     cpdef constructNGramIndex(self)
+    cpdef str topNString(self, int N)
     cpdef searchCollection(self, Query query, SearchParameter searchParameter)

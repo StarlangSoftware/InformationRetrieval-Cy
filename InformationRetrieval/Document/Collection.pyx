@@ -68,6 +68,8 @@ cdef class Collection:
             self.constructIndexesInDisk()
         else:
             self.constructIndexesInMemory()
+        if parameter.getDocumentType() == DocumentType.CATEGORICAL:
+            self.__positional_index.setCategoryCounts(self.__documents)
 
     cpdef int size(self):
         return len(self.__documents)
@@ -97,16 +99,17 @@ cdef class Collection:
     def saveCategories(self):
         output_file = open(self.__name + "-categories.txt", mode="w", encoding="utf-8")
         for document in self.__documents:
-            output_file.write(document.getDocId().__str__() + "\t" + document.getCategoryHierarchy().__str__() + "\n")
+            output_file.write(document.getDocId().__str__() + "\t" + document.getCategory().__str__() + "\n")
         output_file.close()
 
     def loadCategories(self):
+        self.__category_tree = CategoryTree(self.__name)
         input_file = open(self.__name + "-categories.txt", mode="r", encoding="utf-8")
         line = input_file.readline().strip()
         while line != "":
             items = line.split("\t")
             doc_id = int(items[0])
-            self.__documents[doc_id].setCategoryHierarchy(items[1])
+            self.__documents[doc_id].setCategory(self.__category_tree, items[1])
             line = input_file.readline()
         input_file.close()
 
@@ -155,6 +158,10 @@ cdef class Collection:
                     self.__phrase_positional_index = PositionalIndex(self.__phrase_dictionary, terms)
             if self.__parameter.constructNGramIndex():
                 self.constructNGramIndex()
+            if self.__parameter.getDocumentType() == DocumentType.CATEGORICAL:
+                self.__category_tree = CategoryTree(self.__name)
+                for document in self.__documents:
+                    document.loadCategory(self.__category_tree)
 
     cpdef list constructTerms(self, object termType):
         cdef list terms
@@ -550,6 +557,9 @@ cdef class Collection:
         terms = self.__dictionary.constructTermsFromDictionary(3)
         self.__tri_gram_dictionary = TermDictionary(self.__comparator, terms)
         self.__tri_gram_index = NGramIndex(self.__tri_gram_dictionary, terms)
+
+    cpdef str topNString(self, int N):
+        return self.__category_tree.topNString(self.__dictionary, N)
 
     cpdef searchCollection(self,
                          Query query,

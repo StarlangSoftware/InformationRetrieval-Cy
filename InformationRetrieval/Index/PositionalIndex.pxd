@@ -14,6 +14,7 @@ cdef class PositionalIndex:
     cpdef list getTermFrequencies(self, int docId)
     cpdef list getDocumentFrequencies(self)
     cpdef setDocumentSizes(self, list documents)
+    cpdef setCategoryCounts(self, list documents)
     cpdef QueryResult rankedSearch(self,
                      Query query,
                      TermDictionary dictionary,

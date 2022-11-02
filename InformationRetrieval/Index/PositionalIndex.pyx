@@ -136,7 +136,7 @@ cdef class PositionalIndex:
 
     cpdef setDocumentSizes(self, list documents):
         cdef list sizes
-        cdef int i, doc_id
+        cdef int i, doc_id, key
         cdef PositionalPostingList positional_posting_list
         cdef PositionalPosting positional_posting
         cdef Document doc
@@ -151,6 +151,17 @@ cdef class PositionalIndex:
                 sizes[doc_id] = sizes[doc_id] + positional_posting.size()
         for doc in documents:
             doc.setSize(sizes[doc.getDocId()])
+
+    cpdef setCategoryCounts(self, list documents):
+        cdef int i, doc_id, key
+        cdef PositionalPostingList positional_posting_list
+        cdef PositionalPosting positional_posting
+        for key in self.__positional_index.keys():
+            positional_posting_list = self.__positional_index[key]
+            for i in range(positional_posting_list.size()):
+                positional_posting = positional_posting_list.get(i)
+                doc_id = positional_posting.getDocId()
+                documents[doc_id].getCategoryNode().addCounts(key, positional_posting.size())
 
     cpdef QueryResult rankedSearch(self,
                      Query query,
