@@ -14,13 +14,12 @@ cdef class Parameter:
         self.__phrase_index = True
         self.__positional_index = True
         self.__construct_n_gram_index = True
-        self.__construct_index_in_disk = False
-        self.__construct_dictionary_in_disk = False
         self.__limit_number_of_documents_loaded = False
         self.__document_limit = 1000
         self.__word_limit = 10000
         self.__word_comparator = TermOccurrence.ignoreCaseComparator
         self.__document_type = DocumentType.NORMAL
+        self.__representative_count = 10
 
     cpdef object getIndexType(self):
         return self.__index_type
@@ -49,20 +48,17 @@ cdef class Parameter:
     cpdef bint constructNGramIndex(self):
         return self.__construct_n_gram_index
 
-    cpdef bint constructIndexInDisk(self):
-        return self.__construct_index_in_disk
-
     cpdef bint limitNumberOfDocumentsLoaded(self):
         return self.__limit_number_of_documents_loaded
 
     cpdef int getDocumentLimit(self):
         return self.__document_limit
 
-    cpdef bint constructDictionaryInDisk(self):
-        return self.__construct_dictionary_in_disk
-
     cpdef int getWordLimit(self):
         return self.__word_limit
+
+    cpdef int getRepresentativeCount(self):
+        return self.__representative_count
 
     cpdef setIndexType(self, object indexType):
         self.__index_type = indexType
@@ -91,22 +87,17 @@ cdef class Parameter:
     cpdef setNGramIndex(self, bint nGramIndex):
         self.__construct_n_gram_index = nGramIndex
 
-    cpdef setConstructIndexInDisk(self, bint constructIndexInDisk):
-        self.__construct_index_in_disk = constructIndexInDisk
-
     cpdef setLimitNumberOfDocumentsLoaded(self, bint limitNumberOfDocumentsLoaded):
         self.__limit_number_of_documents_loaded = limitNumberOfDocumentsLoaded
 
     cpdef setDocumentLimit(self, int documentLimit):
         self.__document_limit = documentLimit
 
-    cpdef setConstructDictionaryInDisk(self, bint constructDictionaryInDisk):
-        self.__construct_dictionary_in_disk = constructDictionaryInDisk
-        if self.__construct_dictionary_in_disk:
-            self.__construct_index_in_disk = True
-
     cpdef setWordLimit(self, int wordLimit):
         self.__word_limit = wordLimit
+
+    cpdef setRepresentativeCount(self, int representativeCount):
+        self.__representative_count = representativeCount
 
     cpdef object getDocumentType(self):
         return self.__document_type

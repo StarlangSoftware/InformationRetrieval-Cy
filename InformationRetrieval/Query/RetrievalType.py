@@ -5,3 +5,4 @@ class RetrievalType(Enum):
     BOOLEAN = auto()
     POSITIONAL = auto()
     RANKED = auto()
+    ATTRIBUTE = auto()

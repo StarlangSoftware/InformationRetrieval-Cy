@@ -1,3 +1,6 @@
+from InformationRetrieval.Query.CategoryDeterminationType import CategoryDeterminationType
+from InformationRetrieval.Query.Query cimport Query
+
 cdef class CategoryTree:
 
     def __init__(self, rootName: str):
@@ -15,18 +18,20 @@ cdef class CategoryTree:
             current = node
         return current
 
-    cpdef str topNString(self, TermDictionary dictionary, int N):
-        cdef list queue
-        cdef str result
-        cdef CategoryNode node
-        queue = [self.__root]
-        result = ""
-        while len(queue) > 0:
-            node = queue.pop(0)
-            if node != self.__root:
-                result = result + node.topNString(dictionary, N) + "\n"
-            queue.extend(node.getChildren())
+    cpdef list getCategories(self,
+                      Query query,
+                      TermDictionary dictionary,
+                      object categoryDeterminationType):
+        cdef list result
+        result = []
+        if categoryDeterminationType == CategoryDeterminationType.KEYWORD:
+            self.__root.getCategoriesWithKeyword(query, result)
+        elif categoryDeterminationType == CategoryDeterminationType.COSINE:
+            self.__root.getCategoriesWithCosine(query, dictionary, result)
         return result
+
+    cpdef setRepresentativeCount(self, int representativeCount):
+        self.__root.setRepresentativeCount(representativeCount)
 
     def __repr__(self):
         return self.__root.__repr__()

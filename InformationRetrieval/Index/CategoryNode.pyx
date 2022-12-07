@@ -1,10 +1,13 @@
 from DataStructure.CounterHashMap cimport CounterHashMap
-from Dictionary.Word cimport Word
+
+from InformationRetrieval.Index.Term cimport Term
+from InformationRetrieval.Index.TermDictionary cimport TermDictionary
+from InformationRetrieval.Query.Query import Query
 
 cdef class CategoryNode:
 
     def __init__(self, name: str, parent: CategoryNode):
-        self.__name = name
+        self.__category_words = name.split()
         self.__parent = parent
         self.__counts = CounterHashMap()
         self.__children = []
@@ -15,7 +18,12 @@ cdef class CategoryNode:
         self.__children.append(child)
 
     cpdef getName(self):
-        return self.__name
+        cdef int i
+        cdef str result
+        result = self.__category_words[0]
+        for i in range(1, len(self.__category_words)):
+            result += " " + self.__category_words[i]
+        return result
 
     cpdef CategoryNode getChild(self, str childName):
         for child in self.__children:
@@ -30,32 +38,64 @@ cdef class CategoryNode:
             current.__counts.putNTimes(termId, count)
             current = current.__parent
 
+    cpdef bint isDescendant(self, CategoryNode ancestor):
+        if self == ancestor:
+            return True
+        if self.__parent is None:
+            return False
+        return self.__parent.isDescendant(ancestor)
+
     cpdef list getChildren(self):
         return self.__children
-
-    cpdef list topN(self, int N):
-        if N <= len(self.__counts):
-            return self.__counts.topN(N)
-        else:
-            return self.__counts.topN(len(self.__counts))
-
-    cpdef str topNString(self, TermDictionary dictionary, int N):
-        cdef list top_n
-        cdef str result
-        top_n = self.topN(N)
-        result = self.__str__()
-        for item in top_n:
-            if not Word.isPunctuationSymbol(dictionary.getWordWithIndex(item[1]).getName()):
-                result = result + "\t" + dictionary.getWordWithIndex(item[1]).getName() + " (" + item[0].__str__() + ")"
-        return result
 
     def __str__(self) -> str:
         if self.__parent is not None:
             if self.__parent.__parent is not None:
-                return self.__parent.__str__() + "%" + self.__name
+                return self.__parent.__str__() + "%" + self.getName()
             else:
-                return self.__name
+                return self.getName()
         return ""
 
+    cpdef setRepresentativeCount(self, int representativeCount):
+        cdef list top_list
+        if representativeCount <= len(self.__counts):
+            top_list = self.__counts.topN(representativeCount)
+            self.__counts = CounterHashMap()
+            for item in top_list:
+                self.__counts.putNTimes(item[0], item[1])
+
+    cpdef getCategoriesWithKeyword(self,
+                                 Query query,
+                                 list result):
+        cdef double category_score
+        cdef int i
+        cdef CategoryNode child
+        category_score = 0
+        for i in range(query.size()):
+            if query.getTerm(i).getName() in self.__category_words:
+                category_score = category_score + 1
+        if category_score > 0:
+            result.append(self)
+        for child in self.__children:
+            child.getCategoriesWithKeyword(query, result)
+
+    cpdef getCategoriesWithCosine(self,
+                                Query query,
+                                TermDictionary dictionary,
+                                list result):
+        cdef double category_score
+        cdef int i
+        cdef CategoryNode child
+        cdef Term term
+        category_score = 0
+        for i in range(query.size()):
+            term = dictionary.getWord(query.getTerm(i).getName())
+            if term is not None and isinstance(term, Term):
+                category_score = category_score + self.__counts.count(term.getTermId())
+        if category_score > 0:
+            result.append(self)
+        for child in self.__children:
+            child.getCategoriesWithCosine(query, dictionary, result)
+
     def __repr__(self):
-        return self.__name + "(" + self.__children.__repr__() + ")"
+        return self.getName() + "(" + self.__children.__repr__() + ")"
