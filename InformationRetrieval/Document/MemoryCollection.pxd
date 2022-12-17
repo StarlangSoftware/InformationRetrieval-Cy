@@ -19,4 +19,5 @@ cdef class MemoryCollection(AbstractCollection):
     cpdef filterAccordingToCategories(self,
                                     QueryResult currentResult,
                                     list categories)
+    cpdef list autoCompleteWord(self, str prefix)
     cpdef searchCollection(self, Query query, SearchParameter searchParameter)

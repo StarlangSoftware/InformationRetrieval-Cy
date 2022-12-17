@@ -83,6 +83,21 @@ cdef class InvertedIndex:
         posting_list.add(docId)
         self.__index[termId] = posting_list
 
+    cpdef autoCompleteWord(self,
+                         list wordList,
+                         TermDictionary dictionary):
+        cdef list counts
+        cdef str word
+        cdef int i, j
+        counts = []
+        for word in wordList:
+            counts.append(self.__index[dictionary.getWordIndex(word)].size())
+        for i in range(len(wordList) - 1):
+            for j in range(i + 1, len(wordList)):
+                if counts[i] < counts[j]:
+                    counts[i], counts[j] = counts[j], counts[i]
+                    wordList[i], wordList[j] = wordList[j], wordList[i]
+
     cpdef QueryResult search(self,
                              Query query,
                              TermDictionary dictionary):

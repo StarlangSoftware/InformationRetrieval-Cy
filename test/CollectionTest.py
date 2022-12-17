@@ -163,5 +163,23 @@ class CollectionTest(unittest.TestCase):
         result = collection.searchCollection(query, searchParameter)
         self.assertEqual(5, len(result.getItems()))
 
+    def testAutoCompleteWord(self):
+        parameter = Parameter()
+        parameter.setNGramIndex(True)
+        parameter.setLoadIndexesFromFile(True)
+        memoryCollection = MemoryCollection("../testCollection2", parameter)
+        autoCompleteList = memoryCollection.autoCompleteWord("kill")
+        self.assertEqual(1, len(autoCompleteList))
+        autoCompleteList = memoryCollection.autoCompleteWord("Ca")
+        self.assertEqual(2, len(autoCompleteList))
+        memoryCollection = MemoryCollection("../testCollection3", parameter)
+        parameter.setDocumentType(DocumentType.CATEGORICAL)
+        autoCompleteList = memoryCollection.autoCompleteWord("Yeni")
+        self.assertEqual(6, len(autoCompleteList))
+        autoCompleteList = memoryCollection.autoCompleteWord("Ke")
+        self.assertEqual(16, len(autoCompleteList))
+        autoCompleteList = memoryCollection.autoCompleteWord("Bebe")
+        self.assertEqual(12, len(autoCompleteList))
+
 if __name__ == '__main__':
     unittest.main()
