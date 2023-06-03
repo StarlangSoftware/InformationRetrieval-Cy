@@ -15,7 +15,7 @@ cdef class QueryResult:
     cpdef list getItems(self):
         return self.__items
 
-    cpdef QueryResult intersection(self, QueryResult queryResult):
+    cpdef QueryResult intersectionFastSearch(self, QueryResult queryResult):
         cdef QueryResult result
         cdef int i, j
         cdef QueryResultItem item1, item2
@@ -34,6 +34,39 @@ cdef class QueryResult:
                     i = i + 1
                 else:
                     j = j + 1
+        return result
+
+    cpdef QueryResult intersectionBinarySearch(self, QueryResult queryResult):
+        cdef QueryResult result
+        cdef int low, middle, high
+        cdef bint found
+        cdef QueryResultItem searched_item
+        result = QueryResult()
+        for searched_item in self.__items:
+            low = 0
+            high = queryResult.size() - 1
+            middle = (low + high) // 2
+            found = False
+            while low <= high:
+                if searched_item.getDocId() > queryResult.__items[middle].getDocId():
+                    low = middle + 1
+                elif searched_item.getDocId() < queryResult.__items[middle].getDocId():
+                    high = middle - 1
+                else:
+                    found = True
+                    break
+                middle = (low + high) // 2
+            if found:
+                result.add(searched_item.getDocId(), searched_item.getScore())
+        return result
+
+    cpdef QueryResult intersectionLinearSearch(self, QueryResult queryResult):
+        cdef QueryResult result
+        result = QueryResult()
+        for searched_item in self.__items:
+            for item in queryResult.__items:
+                if searched_item.getDocId() == item.getDocId():
+                    result.add(searched_item.getDocId(), searched_item.getScore())
         return result
 
     def getBest(self, K: int):

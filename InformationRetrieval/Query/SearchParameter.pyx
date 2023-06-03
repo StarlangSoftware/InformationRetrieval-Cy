@@ -13,6 +13,7 @@ cdef class SearchParameter:
         self.__documents_retrieved = 1
         self.__category_determination_type = CategoryDeterminationType.KEYWORD
         self.__focus_type = FocusType.OVERALL
+        self.__search_attributes = False
 
     cpdef object getRetrievalType(self):
         return self.__retrieval_type
@@ -32,6 +33,9 @@ cdef class SearchParameter:
     cpdef object getFocusType(self):
         return self.__focus_type
 
+    cpdef object getSearchAttributes(self):
+        return self.__search_attributes
+
     cpdef setRetrievalType(self, object retrievalType):
         self.__retrieval_type = retrievalType
 
@@ -49,3 +53,6 @@ cdef class SearchParameter:
 
     cpdef setFocusType(self, object focusType):
         self.__focus_type = focusType
+
+    cpdef setSearchAttributes(self, object searchAttributes):
+        self.__search_attributes = searchAttributes

@@ -6,7 +6,7 @@ cdef class Query:
 
     cpdef Word getTerm(self, int index)
     cpdef int size(self)
-    cpdef filterAttributes(self,
+    cpdef Query filterAttributes(self,
                          set attributeList,
                          Query termAttributes,
                          Query phraseAttributes)

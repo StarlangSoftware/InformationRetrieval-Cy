@@ -5,4 +5,6 @@ cdef class QueryResult:
     cpdef add(self, int docId, float score = *)
     cpdef list getItems(self)
     cpdef int size(self)
-    cpdef QueryResult intersection(self, QueryResult queryResult)
+    cpdef QueryResult intersectionFastSearch(self, QueryResult queryResult)
+    cpdef QueryResult intersectionBinarySearch(self, QueryResult queryResult)
+    cpdef QueryResult intersectionLinearSearch(self, QueryResult queryResult)

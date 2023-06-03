@@ -12,7 +12,7 @@ cdef class MemoryCollection(AbstractCollection):
     cpdef saveCategories(self)
     cpdef constructIndexesInMemory(self)
     cpdef list constructTerms(self, object termType)
-    cpdef QueryResult attributeSearch(self, Query query)
+    cpdef QueryResult attributeSearch(self, Query query, SearchParameter parameter)
     cpdef QueryResult searchWithInvertedIndex(self,
                                 Query query,
                                 SearchParameter searchParameter)

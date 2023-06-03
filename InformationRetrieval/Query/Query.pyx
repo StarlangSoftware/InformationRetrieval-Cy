@@ -15,12 +15,14 @@ cdef class Query:
     cpdef int size(self):
         return len(self.__terms)
 
-    cpdef filterAttributes(self,
+    cpdef Query filterAttributes(self,
                          set attributeList,
                          Query termAttributes,
                          Query phraseAttributes):
         cdef int i
         cdef str pair
+        cdef Query filtered_query
+        filtered_query = Query()
         i = 0
         while i < self.size():
             if i < self.size() - 1:
@@ -31,4 +33,7 @@ cdef class Query:
                     continue
             if self.__terms[i].getName() in attributeList:
                 termAttributes.__terms.append(self.__terms[i])
+            else:
+                filtered_query.__terms.append(self.__terms[i])
             i = i + 1
+        return filtered_query

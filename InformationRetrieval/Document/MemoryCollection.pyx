@@ -114,23 +114,34 @@ cdef class MemoryCollection(AbstractCollection):
         terms.sort(key=cmp_to_key(TermOccurrence.termOccurrenceComparator))
         return terms
 
-    cpdef QueryResult attributeSearch(self, Query query):
-        cdef Query term_attributes, phrase_attributes
+    cpdef QueryResult attributeSearch(self, Query query, SearchParameter parameter):
+        cdef Query term_attributes, phrase_attributes, filtered_query
         cdef QueryResult term_result, phrase_result
         term_attributes = Query()
         phrase_attributes = Query()
         term_result = QueryResult()
         phrase_result = QueryResult()
-        query.filterAttributes(self.attribute_list, term_attributes, phrase_attributes)
+        filtered_query = query.filterAttributes(self.attribute_list, term_attributes, phrase_attributes)
         if term_attributes.size() > 0:
             term_result = self.inverted_index.search(term_attributes, self.dictionary)
         if phrase_attributes.size() > 0:
             phrase_result = self.phrase_index.search(phrase_attributes, self.phrase_dictionary)
         if term_attributes.size() == 0:
-            return phrase_result
-        if phrase_attributes.size() == 0:
-            return term_result
-        return term_result.intersection(phrase_result)
+            attribute_result = phrase_result
+        elif phrase_attributes.size() == 0:
+            attribute_result = term_result
+        else:
+            attribute_result = term_result.intersectionFastSearch(phrase_result)
+        if filtered_query.size() == 0:
+            return attribute_result
+        else:
+            filtered_result = self.searchWithInvertedIndex(filtered_query, parameter)
+            if parameter.getRetrievalType() != RetrievalType.RANKED:
+                return filtered_result.intersectionFastSearch(attribute_result)
+            elif attribute_result.size() < 10:
+                return filtered_result.intersectionLinearSearch(attribute_result)
+            else:
+                return filtered_result.intersectionBinarySearch(attribute_result)
 
     cpdef QueryResult searchWithInvertedIndex(self,
                                 Query query,
@@ -139,8 +150,6 @@ cdef class MemoryCollection(AbstractCollection):
             return self.inverted_index.search(query, self.dictionary)
         elif searchParameter.getRetrievalType() == RetrievalType.POSITIONAL:
             return self.positional_index.positionalSearch(query, self.dictionary)
-        elif searchParameter.getRetrievalType() == RetrievalType.ATTRIBUTE:
-            return self.attributeSearch(query)
         elif searchParameter.getRetrievalType() == RetrievalType.RANKED:
             return self.positional_index.rankedSearch(query,
                                                         self.dictionary,
@@ -186,7 +195,10 @@ cdef class MemoryCollection(AbstractCollection):
                          Query query,
                          SearchParameter searchParameter):
         if searchParameter.getFocusType() == FocusType.CATEGORY:
-            current_result = self.searchWithInvertedIndex(query, searchParameter)
+            if searchParameter.getSearchAttributes():
+                current_result = self.attributeSearch(query, searchParameter)
+            else:
+                current_result = self.searchWithInvertedIndex(query, searchParameter)
             categories = self.category_tree.getCategories(query,
                                                             self.dictionary,
                                                             searchParameter.getCategoryDeterminationType())
@@ -195,6 +207,9 @@ cdef class MemoryCollection(AbstractCollection):
             if self.__index_type == IndexType.INCIDENCE_MATRIX:
                 return self.incidence_matrix.search(query, self.dictionary)
             elif self.__index_type == IndexType.INVERTED_INDEX:
-                return self.searchWithInvertedIndex(query, searchParameter)
+                if searchParameter.getSearchAttributes():
+                    return self.attributeSearch(query, searchParameter)
+                else:
+                    return self.searchWithInvertedIndex(query, searchParameter)
             else:
                 return QueryResult()

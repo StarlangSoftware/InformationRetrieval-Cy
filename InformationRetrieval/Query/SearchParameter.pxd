@@ -6,6 +6,7 @@ cdef class SearchParameter:
     cdef object __document_weighting
     cdef object __term_weighting
     cdef int __documents_retrieved
+    cdef object __search_attributes
 
     cpdef object getRetrievalType(self)
     cpdef object getDocumentWeighting(self)
@@ -13,9 +14,11 @@ cdef class SearchParameter:
     cpdef int getDocumentsRetrieved(self)
     cpdef object getCategoryDeterminationType(self)
     cpdef object getFocusType(self)
+    cpdef object getSearchAttributes(self)
     cpdef setRetrievalType(self, object retrievalType)
     cpdef setDocumentWeighting(self, object documentWeighting)
     cpdef setTermWeighting(self, object termWeighting)
     cpdef setDocumentsRetrieved(self, int documentsRetrieved)
     cpdef setCategoryDeterminationType(self, object categoryDeterminationType)
     cpdef setFocusType(self, object focusType)
+    cpdef setSearchAttributes(self, object searchAttributes)
