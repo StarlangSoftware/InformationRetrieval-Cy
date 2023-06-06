@@ -22,7 +22,6 @@ from InformationRetrieval.Query.RetrievalType import RetrievalType
 from InformationRetrieval.Query.SearchParameter cimport SearchParameter
 
 cdef class MemoryCollection(AbstractCollection):
-
     def __init__(self,
                  directory: str,
                  parameter: Parameter):
@@ -135,34 +134,42 @@ cdef class MemoryCollection(AbstractCollection):
         if filtered_query.size() == 0:
             return attribute_result
         else:
-            filtered_result = self.searchWithInvertedIndex(filtered_query, parameter)
             if parameter.getRetrievalType() != RetrievalType.RANKED:
+                filtered_result = self.searchWithInvertedIndex(filtered_query, parameter)
                 return filtered_result.intersectionFastSearch(attribute_result)
-            elif attribute_result.size() < 10:
-                return filtered_result.intersectionLinearSearch(attribute_result)
             else:
-                return filtered_result.intersectionBinarySearch(attribute_result)
+                filtered_result = self.positional_index.rankedSearch(filtered_query,
+                                                                     self.dictionary,
+                                                                     self.documents,
+                                                                     parameter)
+                if attribute_result.size() < 10:
+                    filtered_result = filtered_result.intersectionLinearSearch(attribute_result)
+                else:
+                    filtered_result = filtered_result.intersectionBinarySearch(attribute_result)
+                filtered_result.getBest(parameter.getDocumentsRetrieved())
+                return filtered_result
 
     cpdef QueryResult searchWithInvertedIndex(self,
-                                Query query,
-                                SearchParameter searchParameter):
+                                              Query query,
+                                              SearchParameter searchParameter):
+        cdef QueryResult result
         if searchParameter.getRetrievalType() == RetrievalType.BOOLEAN:
             return self.inverted_index.search(query, self.dictionary)
         elif searchParameter.getRetrievalType() == RetrievalType.POSITIONAL:
             return self.positional_index.positionalSearch(query, self.dictionary)
         elif searchParameter.getRetrievalType() == RetrievalType.RANKED:
-            return self.positional_index.rankedSearch(query,
+            result = self.positional_index.rankedSearch(query,
                                                         self.dictionary,
                                                         self.documents,
-                                                        searchParameter.getTermWeighting(),
-                                                        searchParameter.getDocumentWeighting(),
-                                                        searchParameter.getDocumentsRetrieved())
+                                                        searchParameter)
+            result.getBest(searchParameter.getDocumentsRetrieved())
+            return result
         else:
             return QueryResult()
 
     cpdef filterAccordingToCategories(self,
-                                    QueryResult currentResult,
-                                    list categories):
+                                      QueryResult currentResult,
+                                      list categories):
         cdef QueryResult filtered_result
         cdef list items
         cdef QueryResultItem query_result_item
@@ -192,16 +199,16 @@ cdef class MemoryCollection(AbstractCollection):
         return result
 
     cpdef searchCollection(self,
-                         Query query,
-                         SearchParameter searchParameter):
+                           Query query,
+                           SearchParameter searchParameter):
         if searchParameter.getFocusType() == FocusType.CATEGORY:
             if searchParameter.getSearchAttributes():
                 current_result = self.attributeSearch(query, searchParameter)
             else:
                 current_result = self.searchWithInvertedIndex(query, searchParameter)
             categories = self.category_tree.getCategories(query,
-                                                            self.dictionary,
-                                                            searchParameter.getCategoryDeterminationType())
+                                                          self.dictionary,
+                                                          searchParameter.getCategoryDeterminationType())
             return self.filterAccordingToCategories(current_result, categories)
         else:
             if self.__index_type == IndexType.INCIDENCE_MATRIX:

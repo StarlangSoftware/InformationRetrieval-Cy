@@ -1,6 +1,7 @@
 from InformationRetrieval.Index.TermDictionary cimport TermDictionary
 from InformationRetrieval.Query.Query cimport Query
 from InformationRetrieval.Query.QueryResult cimport QueryResult
+from InformationRetrieval.Query.SearchParameter cimport SearchParameter
 
 cdef class PositionalIndex:
 
@@ -19,6 +20,4 @@ cdef class PositionalIndex:
                      Query query,
                      TermDictionary dictionary,
                      list documents,
-                     object termWeighting,
-                     object documentWeighting,
-                     documentsReturned: int)
+                     SearchParameter parameter)

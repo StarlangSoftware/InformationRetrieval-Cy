@@ -167,9 +167,7 @@ cdef class PositionalIndex:
                      Query query,
                      TermDictionary dictionary,
                      list documents,
-                     object termWeighting,
-                     object documentWeighting,
-                     documentsReturned: int):
+                     SearchParameter parameter):
         cdef int N, i, term, j, doc_id
         cdef float tf, df, score
         cdef QueryResult result
@@ -189,12 +187,15 @@ cdef class PositionalIndex:
                     tf = positional_posting.size()
                     df = self.__positional_index[term].size()
                     if tf > 0 and df > 0:
-                        score = VectorSpaceModel.weighting(tf, df, N, termWeighting, documentWeighting)
+                        score = VectorSpaceModel.weighting(tf,
+                                                           df,
+                                                           N,
+                                                           parameter.getTermWeighting(),
+                                                           parameter.getDocumentWeighting())
                         if doc_id in scores:
                             scores[doc_id] = scores[doc_id] + score
                         else:
                             scores[doc_id] = score
         for doc_id in scores:
             result.add(doc_id, scores[doc_id])
-        result.getBest(documentsReturned)
         return result
