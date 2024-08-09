@@ -4,18 +4,40 @@ from InformationRetrieval.Query.QueryResultItem cimport QueryResultItem
 cdef class QueryResult:
 
     def __init__(self):
+        """
+        Empty constructor for the QueryResult object.
+        """
         self.__items = []
 
     cpdef add(self, int docId, float score = 0.0):
+        """
+        Adds a new result item to the list of query result.
+        :param docId: Document id of the result
+        :param score: Score of the result
+        """
         self.__items.append(QueryResultItem(docId, score))
 
     cpdef int size(self):
+        """
+        Returns number of results for query
+        :return: Number of results for query
+        """
         return len(self.__items)
 
     cpdef list getItems(self):
+        """
+        Returns result list for query
+        :return: Result list for query
+        """
         return self.__items
 
     cpdef QueryResult intersectionFastSearch(self, QueryResult queryResult):
+        """
+        Given two query results, this method identifies the intersection of those two results by doing parallel iteration
+        in O(N).
+        :param queryResult: Second query result to be intersected.
+        :return: Intersection of this query result with the second query result
+        """
         cdef QueryResult result
         cdef int i, j
         cdef QueryResultItem item1, item2
@@ -37,6 +59,12 @@ cdef class QueryResult:
         return result
 
     cpdef QueryResult intersectionBinarySearch(self, QueryResult queryResult):
+        """
+        Given two query results, this method identifies the intersection of those two results by doing binary search on
+        the second list in O(N log N).
+        :param queryResult: Second query result to be intersected.
+        :return: Intersection of this query result with the second query result
+        """
         cdef QueryResult result
         cdef int low, middle, high
         cdef bint found
@@ -61,6 +89,12 @@ cdef class QueryResult:
         return result
 
     cpdef QueryResult intersectionLinearSearch(self, QueryResult queryResult):
+        """
+        Given two query results, this method identifies the intersection of those two results by doing exhaustive search
+        on the second list in O(N^2).
+        :param queryResult: Second query result to be intersected.
+        :return: Intersection of this query result with the second query result
+        """
         cdef QueryResult result
         result = QueryResult()
         for searched_item in self.__items:
@@ -70,6 +104,10 @@ cdef class QueryResult:
         return result
 
     def getBest(self, K: int):
+        """
+        The method returns K best results from the query result using min heap in O(K log N + N log K) time.
+        :param K: Size of the best subset.
+        """
         minHeap = MinHeap(K, lambda x1, x2: 1 if x1.getScore() > x2.getScore() else (0 if x1.getScore() == x2.getScore() else -1))
         i = 0
         while i < K and i < len(self.__items):

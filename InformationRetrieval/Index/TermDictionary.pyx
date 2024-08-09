@@ -73,12 +73,24 @@ cdef class TermDictionary(Dictionary):
     cpdef addTerm(self,
                   str name,
                   int termId):
+        """
+        Adds a new term to the sorted words array. First the term is searched in the words array using binary search,
+        then the word is added into the correct place.
+        :param name: Lemma of the term
+        :param termId: Id of the term
+        """
         cdef int middle
         middle = self.__getPosition(Word(name))
         if middle < 0:
             self.words.insert(-middle - 1, Term(name, termId))
 
     cpdef save(self, str fileName):
+        """
+        Saves the term dictionary into the dictionary file. Each line stores the term id and the term name separated via
+        space.
+        :param fileName: Dictionary file name. Real dictionary file name is created by attaching -dictionary.txt to this
+                         file name
+        """
         cdef Word word
         cdef Term term
         output_file = open(fileName + "-dictionary.txt", mode='w', encoding='utf-8')
@@ -91,6 +103,13 @@ cdef class TermDictionary(Dictionary):
     def constructNGrams(word: str,
                         termId: int,
                         k: int) -> [TermOccurrence]:
+        """
+        Constructs all NGrams from a given word. For example, 3 grams for word "term" are "$te", "ter", "erm", "rm$".
+        :param word: Word for which NGrams will b created.
+        :param termId: Term id to add into the posting list.
+        :param k: N in NGram.
+        :return: An array of NGrams for a given word.
+        """
         cdef list n_grams
         cdef int j
         cdef str term
@@ -107,6 +126,12 @@ cdef class TermDictionary(Dictionary):
         return n_grams
 
     cpdef list constructTermsFromDictionary(self, int k):
+        """
+        Constructs all NGrams for all words in the dictionary. For example, 3 grams for word "term" are "$te", "ter",
+        "erm", "rm$".
+        :param k: N in NGram.
+        :return: A sorted array of NGrams for all words in the dictionary.
+        """
         cdef list terms
         cdef int i
         cdef str word

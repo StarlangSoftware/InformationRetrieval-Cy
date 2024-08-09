@@ -7,6 +7,13 @@ cdef class PositionalPostingList:
     def __init__(self,
                  infile: TextIO = None,
                  count: int = None):
+        """
+        Reads a positional posting list from a file. Reads N lines, where each line stores a positional posting. The
+        first item in the line shows document id. The second item in the line shows the number of positional postings.
+        Other items show the positional postings.
+        :param infile: Input stream to read from.
+        :param count: Number of positional postings for this positional posting list.
+        """
         cdef int i, j, doc_id, number_of_positional_postings, positional_posting
         cdef list ids
         cdef str, line
@@ -23,9 +30,18 @@ cdef class PositionalPostingList:
                         self.add(doc_id, positional_posting)
 
     cpdef int size(self):
+        """
+        Returns the number of positional postings in the posting list.
+        :return: Number of positional postings in the posting list.
+        """
         return len(self.__postings)
 
     cpdef int getIndex(self, int docId):
+        """
+        Does a binary search on the positional postings list for a specific document id.
+        :param docId: Document id to be searched.
+        :return: The position of the document id in the positional posting list. If it does not exist, the method returns
+        """
         cdef int begin, end, middle
         begin = 0
         end = self.size() - 1
@@ -41,6 +57,11 @@ cdef class PositionalPostingList:
         return -1
 
     cpdef QueryResult toQueryResult(self):
+        """
+        Converts the positional postings list to a query result object. Simply adds all positional postings one by one
+        to the result.
+        :return: QueryResult object containing the positional postings in this object.
+        """
         cdef QueryResult result
         cdef PositionalPosting posting
         result = QueryResult()
@@ -51,6 +72,11 @@ cdef class PositionalPostingList:
     cpdef add(self,
               int docId,
               int position):
+        """
+        Adds a new positional posting (document id and position) to the posting list.
+        :param docId: New document id to be added to the positional posting list.
+        :param position: New position to be added to the positional posting list.
+        """
         cdef int index
         index = self.getIndex(docId)
         if index == -1:
@@ -60,9 +86,20 @@ cdef class PositionalPostingList:
             self.__postings[index].add(position)
 
     cpdef PositionalPosting get(self, int index):
+        """
+        Gets the positional posting at position index.
+        :param index: Position of the positional posting.
+        :return: The positional posting at position index.
+        """
         return self.__postings[index]
 
     cpdef PositionalPostingList union(self, PositionalPostingList secondList):
+        """
+        Returns simple union of two positional postings list p1 and p2. The algorithm assumes the intersection of two
+        positional postings list is empty, therefore the union is just concatenation of two positional postings lists.
+        :param secondList: p2
+        :return: Union of two positional postings lists.
+        """
         cdef PositionalPostingList result
         result = PositionalPostingList()
         result.__postings.extend(self.__postings)
@@ -70,6 +107,17 @@ cdef class PositionalPostingList:
         return result
 
     cpdef PositionalPostingList intersection(self, PositionalPostingList secondList):
+        """
+        Algorithm for the intersection of two positional postings lists p1 and p2. We maintain pointers into both lists
+        and walk through the two positional postings lists simultaneously, in time linear in the total number of postings
+        entries. At each step, we compare the docID pointed to by both pointers. If they are not the same, we advance the
+        pointer pointing to the smaller docID. Otherwise, we advance both pointers and do the same intersection search on
+        the positional lists of two documents. Similarly, we compare the positions pointed to by both position pointers.
+        If they are successive, we add the position to the result and advance both position pointers. Otherwise, we
+        advance the pointer pointing to the smaller position.
+        :param secondList: p2, second posting list.
+        :return: Intersection of two postings lists p1 and p2.
+        """
         cdef int i, j, position1, position2
         cdef PositionalPostingList result
         cdef PositionalPosting p1, p2
@@ -108,6 +156,10 @@ cdef class PositionalPostingList:
         return result
 
     def __str__(self) -> str:
+        """
+        Converts the positional posting list to a string. String is of the form all postings separated via space.
+        :return: String form of the positional posting list.
+        """
         cdef str result
         cdef PositionalPosting positional_posting
         result = ""
@@ -118,6 +170,11 @@ cdef class PositionalPostingList:
     cpdef writeToFile(self,
                       object outfile,
                       int index):
+        """
+        Prints this object into a file with the given index.
+        :param outfile: Output stream to write the file.
+        :param index: Position of this positional posting list in the inverted index.
+        """
         if self.size() > 0:
             outfile.write(index.__str__() + " " + self.size().__str__() + "\n")
             outfile.write(self.__str__())

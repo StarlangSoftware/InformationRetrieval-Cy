@@ -10,6 +10,14 @@ cdef class DiskCollection(AbstractCollection):
         super().__init__(directory, parameter)
 
     cpdef bint notCombinedAllIndexes(self, list currentIdList):
+        """
+        In single pass in memory indexing, the index files are merged to get the final index file. This method
+        checks if all parallel index files are combined or not.
+        :param currentIdList: Current pointers for the terms in parallel index files. currentIdList[0] is the current term
+                             in the first index file to be combined, currentIdList[2] is the current term in the second
+                             index file to be combined etc.
+        :return: True, if all merge operation is completed, false otherwise.
+        """
         cdef int _id
         for _id in currentIdList:
             if _id != -1:
@@ -17,6 +25,15 @@ cdef class DiskCollection(AbstractCollection):
         return False
 
     cpdef list selectIndexesWithMinimumTermIds(self, list currentIdList):
+        """
+        In single pass in memory indexing, the index files are merged to get the final index file. This method
+        identifies the indexes whose terms to be merged have the smallest term id. They will be selected and
+        combined in the next phase.
+        :param currentIdList: Current pointers for the terms in parallel index files. currentIdList[0] is the current term
+                             in the first index file to be combined, currentIdList[2] is the current term in the second
+                             index file to be combined etc.
+        :return: An array list of indexes for the index files, whose terms to be merged have the smallest term id.
+        """
         cdef list result
         cdef int _id
         cdef float _min
@@ -33,6 +50,14 @@ cdef class DiskCollection(AbstractCollection):
     cpdef combineMultiplePositionalIndexesInDisk(self,
                                                  str name,
                                                  int blockCount):
+        """
+        In single pass in memory indexing, the index files are merged to get the final index file. This method
+        implements the merging algorithm. Reads the index files in parallel and at each iteration merges the posting
+        lists of the smallest term and put it to the merged index file. Updates the pointers of the indexes accordingly.
+        :param name: Name of the collection.
+        :param tmpName: Temporary name of the index files.
+        :param blockCount: Number of index files to be merged.
+        """
         cdef list current_id_list, current_posting_lists, files, items, indexes_to_combine
         cdef int i
         cdef str line
@@ -69,6 +94,13 @@ cdef class DiskCollection(AbstractCollection):
                                              str name,
                                              str tmpName,
                                              int blockCount):
+        """
+        In single pass in memory indexing, the index files are merged to get the final index file. This method
+        implements the merging algorithm. Reads the index files in parallel and at each iteration merges the positional
+        posting lists of the smallest term and put it to the merged index file. Updates the pointers of the indexes accordingly.
+        :param name: Name of the collection.
+        :param blockCount: Number of index files to be merged.
+        """
         cdef list current_id_list, current_posting_lists, files, items, indexes_to_combine
         cdef PostingList merged_posting_list
         cdef int i

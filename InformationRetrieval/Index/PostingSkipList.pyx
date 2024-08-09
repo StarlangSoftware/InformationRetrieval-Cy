@@ -5,10 +5,17 @@ from InformationRetrieval.Index.PostingSkip cimport PostingSkip
 cdef class PostingSkipList(PostingList):
 
     def __init__(self):
+        """
+        Constructor for the PostingSkipList class.
+        """
         super().__init__()
         self.__skipped = False
 
     cpdef add(self, int docId):
+        """
+        Adds a new posting (document id) to the posting skip list.
+        :param docId: New document id to be added to the posting skip list.
+        """
         cdef PostingSkip p
         cdef PostingSkip last
         p = PostingSkip(docId)
@@ -17,6 +24,12 @@ cdef class PostingSkipList(PostingList):
         self.__postings.append(p)
 
     cpdef addSkipPointers(self):
+        """
+        Augments postings lists with skip pointers. Skip pointers are effectively shortcuts that allow us to avoid
+        processing parts of the postings list that will not figure in the search results. We follow a simple heuristic
+        for placing skips, which has been found to work well in practice, is that for a postings list of length P, use
+        square root of P evenly-spaced skip pointers.
+        """
         cdef int N, i, j, posting, skip
         cdef PostingSkip current
         N = int(sqrt(self.size()))
@@ -37,6 +50,15 @@ cdef class PostingSkipList(PostingList):
                 i = i + 1
 
     cpdef PostingList intersection(self, PostingList secondList):
+        """
+        Algorithm for the intersection of two postings skip lists p1 and p2. We maintain pointers into both lists and
+        walk through the two postings lists simultaneously, in time linear in the total number of postings entries. At
+        each step, we compare the docID pointed to by both pointers. If they are the same, we put that docID in the
+        results list, and advance both pointers. Otherwise, we advance the pointer pointing to the smaller docID or use
+        skip pointers to skip as many postings as possible.
+        :param secondList: p2, second posting list.
+        :return: Intersection of two postings lists p1 and p2.
+        """
         cdef PostingSkip p1, p2
         p1 = self.__postings[0]
         p2 = secondList.__postings[0]

@@ -13,10 +13,25 @@ cdef class MediumCollection(DiskCollection):
     def __init__(self,
                  directory: str,
                  parameter: Parameter):
+        """
+        Constructor for the MediumCollection class. In medium collections, dictionary is kept in memory and indexes are
+        stored in the disk and don't fit in memory in their construction phase and usage phase. For that reason, in their
+        construction phase, multiple disk reads and optimizations are needed.
+        :param directory: Directory where the document collection resides.
+        :param parameter: Search parameter
+        """
         super().__init__(directory, parameter)
         self.constructIndexesInDisk()
 
     cpdef set constructDistinctWordList(self, object termType):
+        """
+        Given the document collection, creates a hash set of distinct terms. If term type is TOKEN, the terms are single
+        word, if the term type is PHRASE, the terms are bi-words. Each document is loaded into memory and distinct
+        word list is created. Since the dictionary can be kept in memory, all operations can be done in memory.
+        :param termType: If term type is TOKEN, the terms are single word, if the term type is PHRASE, the terms are
+                         bi-words.
+        :return: Hash set of terms occurring in the document collection.
+        """
         cdef set words, doc_words
         cdef Document doc
         cdef DocumentText document_text
@@ -28,6 +43,11 @@ cdef class MediumCollection(DiskCollection):
         return words
 
     cpdef constructIndexesInDisk(self):
+        """
+        In block sort based indexing, the indexes are created in a block wise manner. They do not fit in memory, therefore
+        documents are read one by one. According to the search parameter, inverted index, positional index, phrase
+        indexes, N-Gram indexes are constructed in disk.
+        """
         cdef set word_list
         word_list = self.constructDistinctWordList(TermType.TOKEN)
         self.dictionary = TermDictionary(self.comparator, word_list)
@@ -46,6 +66,16 @@ cdef class MediumCollection(DiskCollection):
     cpdef constructInvertedIndexInDisk(self,
                                      TermDictionary dictionary,
                                      object termType):
+        """
+        In block sort based indexing, the inverted index is created in a block wise manner. It does not fit in memory,
+        therefore documents are read one by one. For each document, the terms are added to the inverted index. If the
+        number of documents read are above the limit, current partial inverted index file is saved and new inverted index
+        file is open. After reading all documents, we combine the inverted index files to get the final inverted index
+        file.
+        :param dictionary: Term dictionary.
+        :param termType: If term type is TOKEN, the terms are single word, if the term type is PHRASE, the terms are
+                         bi-words.
+        """
         cdef int i, block_count, term_id
         cdef InvertedIndex inverted_index
         cdef Document doc
@@ -79,6 +109,16 @@ cdef class MediumCollection(DiskCollection):
     cpdef constructPositionalIndexInDisk(self,
                                          TermDictionary dictionary,
                                          object termType):
+        """
+        In block sort based indexing, the positional index is created in a block wise manner. It does not fit in memory,
+        therefore documents are read one by one. For each document, the terms are added to the positional index. If the
+        number of documents read are above the limit, current partial positional index file is saved and new positional
+        index file is open. After reading all documents, we combine the posiitonal index files to get the final
+        positional index file.
+        :param dictionary: Term dictionary.
+        :param termType: If term type is TOKEN, the terms are single word, if the term type is PHRASE, the terms are
+                         bi-words.
+        """
         cdef int i, block_count, term_id
         cdef PositionalIndex positional_index
         cdef Document doc

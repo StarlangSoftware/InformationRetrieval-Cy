@@ -1,4 +1,5 @@
 from InformationRetrieval.Index.TermDictionary cimport TermDictionary
+from InformationRetrieval.Index.TermOccurrence cimport TermOccurrence
 from InformationRetrieval.Query.Query cimport Query
 from InformationRetrieval.Query.QueryResult cimport QueryResult
 from InformationRetrieval.Query.SearchParameter cimport SearchParameter
@@ -7,6 +8,8 @@ cdef class PositionalIndex:
 
     cdef object __positional_index
 
+    cpdef constructor1(self, str fileName)
+    cpdef constructor2(self, dictionaryOrfileName: object, terms: [TermOccurrence])
     cpdef readPositionalPostingList(self, str fileName)
     cpdef saveSorted(self, str fileName)
     cpdef save(self, str fileName)
