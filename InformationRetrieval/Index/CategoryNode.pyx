@@ -1,3 +1,5 @@
+from typing import Optional
+
 from DataStructure.CounterHashMap cimport CounterHashMap
 
 from InformationRetrieval.Index.Term cimport Term
@@ -6,7 +8,7 @@ from InformationRetrieval.Query.Query import Query
 
 cdef class CategoryNode:
 
-    def __init__(self, name: str, parent: CategoryNode):
+    def __init__(self, name: str, parent: Optional[CategoryNode]):
         """
         Constructor for the category node. Each category is represented as a tree node in the category tree. Category
         words are constructed by splitting the name of the category w.r.t. space. Sets the parent node and adds this
